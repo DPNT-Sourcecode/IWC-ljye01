@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from re import purge
+
 from .utils import call_dequeue, call_enqueue, call_size, iso_ts, run_queue
 
 
@@ -35,5 +37,9 @@ def test_timestamp() -> None:
 
 def test_empty() -> None:
     run_queue([
-        call_dequeue().expect(None)
+        call_enqueue("logs", 1, iso_ts(delta_minutes=0)).expect(1),
+        call_enqueue("banks", 5, iso_ts(delta_minutes=0)).expect(2),
+        call_enqueue("loans", 1, iso_ts(delta_minutes=0)).expect(3),
+        call_enqueue("users", 1, iso_ts(delta_minutes=0)).expect(4),
+        call_size().expect(4),
     ])
