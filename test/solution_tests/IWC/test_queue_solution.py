@@ -35,9 +35,9 @@ def test_timestamp() -> None:
         call_dequeue().expect("logs", 1),
     ])
 
-def test_empty() -> None:
+def test_dependency() -> None:
     run_queue([
-        call_enqueue("logs", 1, iso_ts(delta_minutes=0)).expect(1),
+        call_enqueue(provider="logs", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
         call_enqueue("banks", 5, iso_ts(delta_minutes=0)).expect(2),
         call_enqueue("loans", 1, iso_ts(delta_minutes=0)).expect(3),
         call_enqueue("users", 1, iso_ts(delta_minutes=0)).expect(4),
