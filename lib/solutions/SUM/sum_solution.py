@@ -6,4 +6,3 @@ class SumSolution:
 
 if __name__ == "__main__":
     print(SumSolution().compute(1,5))
-
