@@ -14,6 +14,12 @@ def test_enqueue_size_dequeue_flow() -> None:
 def test() -> None:
     run_queue([
         call_enqueue("logs", 1, iso_ts(delta_minutes=0)).expect(1),
-        call_size().expect(1),
+        call_enqueue("banks", 5, iso_ts(delta_minutes=0)).expect(2),
+        call_enqueue("loans", 1, iso_ts(delta_minutes=0)).expect(3),
+        call_enqueue("users", 1, iso_ts(delta_minutes=0)).expect(4),
+        call_size().expect(4),
         call_dequeue().expect("logs", 1),
+        call_dequeue().expect("loans", 1),
+        call_dequeue().expect("users", 1),
+        call_dequeue().expect("banks", 5),
     ])
