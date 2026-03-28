@@ -180,8 +180,8 @@ def test_time_sensitive_bank_beats_group_and_later_tasks() -> None:
         call_enqueue(provider="id_verification", user_id=1, timestamp=iso_ts(delta_minutes=9)).expect(6),
 
         call_dequeue().expect(provider="companies_house", user_id=2),
-        call_dequeue().expect(provider="id_verification", user_id=2),
         call_dequeue().expect(provider="bank_statements", user_id=1),
+        call_dequeue().expect(provider="id_verification", user_id=2),
         call_dequeue().expect(provider="bank_statements", user_id=2),
         call_dequeue().expect(provider="companies_house", user_id=1),
         call_dequeue().expect(provider="id_verification", user_id=1),
@@ -202,3 +202,4 @@ def test_time_sensitive_bank_fifo_tie_breaker() -> None:
         call_dequeue().expect(provider="companies_house", user_id=1),
         call_dequeue().expect(provider="companies_house", user_id=3),
     ])
+
