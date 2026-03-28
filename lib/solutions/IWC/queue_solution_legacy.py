@@ -94,7 +94,11 @@ class Queue:
             if task not in statements:
                 continue
             task_timestamp = self._timestamp_for_task(task)
-            if oldest_task is None or
+            if oldest_task is None or task_timestamp < oldest_timestamp:
+                oldest_task = task
+                oldest_timestamp = task_timestamp
+
+        return oldest_task
 
     def _has_older_task(self, task):
         task_timestamp = self._timestamp_for_task(task)
@@ -321,4 +325,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
