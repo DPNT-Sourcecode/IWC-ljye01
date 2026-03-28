@@ -60,26 +60,22 @@ class Queue:
 
 
     def _check_bank_statement(self,task):
-        if task.provider != "bank_statements":
-            return 0
-        if self._is_old_bank_statement(task):
-            return 0
-        return 1
+        return 1 if task.provider == "bank_statements" else 0
+
 
     def _is_old_bank_statement(self,task):
         if task.provider != "bank_statements":
-            return False
+            return 1
 
         if not self._queue:
-            return False
+            return 1
 
         task_timestamp = self._timestamp_for_task(task)
-
         newest_task_timestamp = max(self._timestamp_for_task(t) for t in self._queue)
 
         age = (newest_task_timestamp - task_timestamp).total_seconds()
 
-        return age >= 300
+        return 1 if age >= 300 else 0
 
     def _collect_dependencies(self, task: TaskSubmission) -> list[TaskSubmission]:
         provider = next((p for p in REGISTERED_PROVIDERS if p.name == task.provider), None)
@@ -291,6 +287,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
