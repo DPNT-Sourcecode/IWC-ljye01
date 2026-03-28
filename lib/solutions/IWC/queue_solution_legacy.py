@@ -169,7 +169,7 @@ class Queue:
 
         self._queue.sort(
             key=lambda i: (
-                self._check_bank_statement(i),
+                self._is_old_bank_statement(i),
                 self._priority_for_task(i),
                 self._earliest_group_timestamp_for_task(i),
                 self._check_bank_statement(i),
@@ -288,9 +288,3 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
-
-
-
-
-
-
