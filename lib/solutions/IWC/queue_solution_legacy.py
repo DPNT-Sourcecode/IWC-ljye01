@@ -64,6 +64,12 @@ class Queue:
         else:
             return False
 
+    def _check_bank_statement_time(self, task):
+        if not self._check_bank_statement(task):
+            return False
+        task_timestamp=self._timestamp_for_task(task)
+        
+
     def _collect_dependencies(self, task: TaskSubmission) -> list[TaskSubmission]:
         provider = next((p for p in REGISTERED_PROVIDERS if p.name == task.provider), None)
         if provider is None:
@@ -275,3 +281,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
