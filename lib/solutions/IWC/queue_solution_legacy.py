@@ -88,7 +88,22 @@ class Queue:
         if not statements:
             return None
 
-        statements
+        statements.sort(
+            key=lambda i: (
+                self._timestamp_for_task(i),
+                i.metadata.get("order", 0)
+            )
+        )
+
+        statement = statements[0]
+
+        for task in self._queue:
+            if task is statement:
+                continue
+
+            timestamps = self._timestamp_for_task(task)
+            if timestamps<self._timestamp_for_task(statement):
+                return None
 
     def _collect_dependencies(self, task: TaskSubmission) -> list[TaskSubmission]:
         provider = next((p for p in REGISTERED_PROVIDERS if p.name == task.provider), None)
@@ -307,6 +322,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
