@@ -103,12 +103,15 @@ class Queue:
             metadata = task.metadata
             metadata.setdefault("priority", Priority.NORMAL)
             metadata.setdefault("group_earliest_timestamp", MAX_TIMESTAMP)
-            duplicate_index = self._check_duplicate(task)
-            if not duplicate_index:
+            old_index = self._check_duplicate(task)
+            if not old_index:
                 self._queue.append(task)
                 continue
-            duplicate = self._queue[duplicate_index]
-            duplicate_timestamp = self._timestamp_for_task(duplicate)
+            duplicate = self._queue[old_index]
+            new_timestamp = self._timestamp_for_task(task)
+            old_timestamp = self._timestamp_for_task(duplicate)
+            if new_timestamp<old_timestamp:
+                self._queue.append(task)
         return self.size
 
     def dequeue(self):
@@ -253,6 +256,3 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
-
-
-
