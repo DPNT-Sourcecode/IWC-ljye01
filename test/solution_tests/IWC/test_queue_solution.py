@@ -202,4 +202,3 @@ def test_time_sensitive_bank_fifo_tie_breaker() -> None:
         call_dequeue().expect(provider="companies_house", user_id=1),
         call_dequeue().expect(provider="companies_house", user_id=3),
     ])
-
