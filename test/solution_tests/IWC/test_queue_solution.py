@@ -57,7 +57,7 @@ def test_unique_with_timestamp() -> None:
         call_size().expect(2),
     ])
 
-def test_bank_statement_deprio() -> None:
+def test_bank_statement_three_deprio() -> None:
     run_queue([
         call_enqueue(provider="companies_house", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
         call_enqueue(provider="bank_statements", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(2),
@@ -65,5 +65,16 @@ def test_bank_statement_deprio() -> None:
         call_size().expect(3),
         call_dequeue().expect(provider="companies_house", user_id=1),
         call_dequeue().expect(provider="id_verification", user_id=1),
+        call_dequeue().expect(provider="bank_statements", user_id=1),
+    ])
+
+def test_bank_statement_deprio() -> None:
+    run_queue([
+        call_enqueue(provider="companies_house", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
+        call_enqueue(provider="bank_statements", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(2),
+        call_enqueue(provider="id_verification", user_id=5, timestamp=iso_ts(delta_minutes=0)).expect(3),
+        call_size().expect(3),
+        call_dequeue().expect(provider="companies_house", user_id=1),
+        call_dequeue().expect(provider="id_verification", user_id=5),
         call_dequeue().expect(provider="bank_statements", user_id=1),
     ])
