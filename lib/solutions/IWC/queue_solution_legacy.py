@@ -88,6 +88,9 @@ class Queue:
             return None
         return min(statements, key=self._timestamp_for_task)
 
+    def _has_older_task(self, task):
+        task_timestamp = self._timestamp_for_task(task)
+
     def _collect_dependencies(self, task: TaskSubmission) -> list[TaskSubmission]:
         provider = next((p for p in REGISTERED_PROVIDERS if p.name == task.provider), None)
         if provider is None:
@@ -299,4 +302,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
