@@ -59,7 +59,10 @@ class Queue:
 
     @staticmethod
     def _check_bank_statement(task):
-        
+        if task.provider == "bank_statements":
+            return True
+        else:
+            return False
 
     def _collect_dependencies(self, task: TaskSubmission) -> list[TaskSubmission]:
         provider = next((p for p in REGISTERED_PROVIDERS if p.name == task.provider), None)
@@ -156,6 +159,7 @@ class Queue:
                 self._priority_for_task(i),
                 self._earliest_group_timestamp_for_task(i),
                 self._timestamp_for_task(i),
+                self._check_bank_statement(i)
             )
         )
 

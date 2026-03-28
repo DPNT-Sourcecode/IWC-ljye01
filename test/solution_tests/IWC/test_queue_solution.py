@@ -56,3 +56,6 @@ def test_unique_with_timestamp() -> None:
         call_enqueue(provider="credit_check", user_id=1, timestamp=iso_ts(delta_minutes=2)).expect(2),
         call_size().expect(2),
     ])
+
+def test_bank_statement_check() -> bool:
+    pass
