@@ -143,4 +143,3 @@ def test_old_bank_statements_use_fifo_order() -> None:
         call_dequeue().expect(provider="bank_statements", user_id=1),
         call_dequeue().expect(provider="companies_house", user_id=3)
     ])
-
