@@ -175,7 +175,10 @@ class Queue:
 
     @property
     def age(self):
-        return 0
+        if not self._queue:
+            return 0
+        
+
 
     def purge(self):
         self._queue.clear()
@@ -264,3 +267,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
