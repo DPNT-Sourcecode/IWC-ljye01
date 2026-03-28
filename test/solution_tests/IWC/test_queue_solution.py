@@ -143,3 +143,62 @@ def test_old_bank_statements_use_fifo_order() -> None:
         call_dequeue().expect(provider="bank_statements", user_id=2),
         call_dequeue().expect(provider="companies_house", user_id=3)
     ])
+
+def test_time_sensitive_bank_same_timestamp_goes_first() -> None:
+    run_queue([
+        call_enqueue(provider="companies_house", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
+        call_enqueue(provider="bank_statements", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(2),
+        call_enqueue(provider="id_verification", user_id=6, timestamp=iso_ts(delta_minutes=6)).expect(3),
+
+        call_dequeue().expect(provider="bank_statements", user_id=1),
+        call_dequeue().expect(provider="companies_house", user_id=1),
+        call_dequeue().expect(provider="id_verification", user_id=6),
+    ])
+
+
+def test_time_sensitive_bank_beats_rule_of_three_group() -> None:
+    run_queue([
+        call_enqueue(provider="bank_statements", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
+        call_enqueue(provider="companies_house", user_id=2, timestamp=iso_ts(delta_minutes=1)).expect(2),
+        call_enqueue(provider="id_verification", user_id=2, timestamp=iso_ts(delta_minutes=6)).expect(3),
+        call_enqueue(provider="bank_statements", user_id=2, timestamp=iso_ts(delta_minutes=7)).expect(4),
+
+        call_dequeue().expect(provider="bank_statements", user_id=1),
+        call_dequeue().expect(provider="companies_house", user_id=2),
+        call_dequeue().expect(provider="id_verification", user_id=2),
+        call_dequeue().expect(provider="bank_statements", user_id=2),
+    ])
+
+
+def test_time_sensitive_bank_beats_group_and_later_tasks() -> None:
+    run_queue([
+        call_enqueue(provider="companies_house", user_id=2, timestamp=iso_ts(delta_minutes=0)).expect(1),
+        call_enqueue(provider="bank_statements", user_id=1, timestamp=iso_ts(delta_minutes=1)).expect(2),
+        call_enqueue(provider="id_verification", user_id=2, timestamp=iso_ts(delta_minutes=2)).expect(3),
+        call_enqueue(provider="bank_statements", user_id=2, timestamp=iso_ts(delta_minutes=7)).expect(4),
+        call_enqueue(provider="companies_house", user_id=1, timestamp=iso_ts(delta_minutes=8)).expect(5),
+        call_enqueue(provider="id_verification", user_id=1, timestamp=iso_ts(delta_minutes=9)).expect(6),
+
+        call_dequeue().expect(provider="companies_house", user_id=2),
+        call_dequeue().expect(provider="id_verification", user_id=2),
+        call_dequeue().expect(provider="bank_statements", user_id=1),
+        call_dequeue().expect(provider="bank_statements", user_id=2),
+        call_dequeue().expect(provider="companies_house", user_id=1),
+        call_dequeue().expect(provider="id_verification", user_id=1),
+    ])
+
+
+def test_time_sensitive_bank_fifo_tie_breaker() -> None:
+    run_queue([
+        call_enqueue(provider="id_verification", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
+        call_enqueue(provider="bank_statements", user_id=2, timestamp=iso_ts(delta_minutes=2)).expect(2),
+        call_enqueue(provider="bank_statements", user_id=1, timestamp=iso_ts(delta_minutes=2)).expect(3),
+        call_enqueue(provider="companies_house", user_id=1, timestamp=iso_ts(delta_minutes=3)).expect(4),
+        call_enqueue(provider="companies_house", user_id=3, timestamp=iso_ts(delta_minutes=10)).expect(5),
+
+        call_dequeue().expect(provider="id_verification", user_id=1),
+        call_dequeue().expect(provider="bank_statements", user_id=2),
+        call_dequeue().expect(provider="bank_statements", user_id=1),
+        call_dequeue().expect(provider="companies_house", user_id=1),
+        call_dequeue().expect(provider="companies_house", user_id=3),
+    ])
