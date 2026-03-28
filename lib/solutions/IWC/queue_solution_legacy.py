@@ -180,11 +180,11 @@ class Queue:
 
         self._queue.sort(
             key=lambda i: (
-                0 if i.metadata.get("time_sensitive_bank_statement", False) else 1,
                 self._priority_for_task(i),
                 self._earliest_group_timestamp_for_task(i),
                 self._check_bank_statement(i),
-                self._timestamp_for_task(i)
+                self._timestamp_for_task(i),
+                
             )
         )
 
@@ -300,5 +300,6 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
