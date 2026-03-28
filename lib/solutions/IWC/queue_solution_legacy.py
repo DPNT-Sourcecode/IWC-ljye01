@@ -63,9 +63,8 @@ class Queue:
         if task.provider != "bank_statements":
             return 0
 
-        if self._is_old_bank_statement(task):
+        if task.metadata.get("time_sensitive_bank_statement", False):
             return 0
-
         return 1
 
 
@@ -174,7 +173,7 @@ class Queue:
                 metadata["priority"] = priority_level
 
         for task in self._queue:
-            task.metadata[""]
+            task.metadata["time_sensitive_bank_statement"] = self._is_old_bank_statement(task)
 
         self._queue.sort(
             key=lambda i: (
@@ -296,6 +295,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
