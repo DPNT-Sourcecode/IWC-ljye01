@@ -51,9 +51,11 @@ class Queue:
     def __init__(self):
         self._queue = []
 
-    def _check_duplicate(self, task: TaskSubmission):
-        for i, task in enumerate(self._queue):
-            if task.user_id
+    def _check_duplicate(self, task: TaskSubmission) -> int|None:
+        for i, q_task in enumerate(self._queue):
+            if task.user_id == q_task.user_id and task.provider == q_task.provider:
+                return i
+        return None
 
     def _collect_dependencies(self, task: TaskSubmission) -> list[TaskSubmission]:
         provider = next((p for p in REGISTERED_PROVIDERS if p.name == task.provider), None)
@@ -101,7 +103,11 @@ class Queue:
             metadata = task.metadata
             metadata.setdefault("priority", Priority.NORMAL)
             metadata.setdefault("group_earliest_timestamp", MAX_TIMESTAMP)
-            self._queue.append(task)
+            duplicate = self._check_duplicate(task)
+            if not duplicate:
+                self._queue.append(task)
+                continue
+            du
         return self.size
 
     def dequeue(self):
@@ -246,4 +252,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
