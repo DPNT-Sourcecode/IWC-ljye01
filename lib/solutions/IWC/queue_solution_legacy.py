@@ -6,10 +6,12 @@ from enum import IntEnum
 # RESOLVED on deploy
 from lib.solutions.IWC.task_types import TaskSubmission, TaskDispatch
 
+
 class Priority(IntEnum):
     """Represents the queue ordering tiers observed in the legacy system."""
     HIGH = 1
     NORMAL = 2
+
 
 @dataclass
 class Provider:
@@ -17,19 +19,18 @@ class Provider:
     base_url: str
     depends_on: list[str]
 
+
 MAX_TIMESTAMP = datetime.max.replace(tzinfo=None)
 
 COMPANIES_HOUSE_PROVIDER = Provider(
     name="companies_house", base_url="https://fake.companieshouse.co.uk", depends_on=[]
 )
 
-
 CREDIT_CHECK_PROVIDER = Provider(
     name="credit_check",
     base_url="https://fake.creditcheck.co.uk",
     depends_on=["companies_house"],
 )
-
 
 BANK_STATEMENTS_PROVIDER = Provider(
     name="bank_statements", base_url="https://fake.bankstatements.co.uk", depends_on=[]
@@ -39,7 +40,6 @@ ID_VERIFICATION_PROVIDER = Provider(
     name="id_verification", base_url="https://fake.idv.co.uk", depends_on=[]
 )
 
-
 REGISTERED_PROVIDERS: list[Provider] = [
     BANK_STATEMENTS_PROVIDER,
     COMPANIES_HOUSE_PROVIDER,
@@ -47,11 +47,12 @@ REGISTERED_PROVIDERS: list[Provider] = [
     ID_VERIFICATION_PROVIDER,
 ]
 
+
 class Queue:
     def __init__(self):
         self._queue = []
 
-    def _check_duplicate(self, task: TaskSubmission) -> int|None:
+    def _check_duplicate(self, task: TaskSubmission) -> int | None:
         for i, q_task in enumerate(self._queue):
             if task.user_id == q_task.user_id and task.provider == q_task.provider:
                 return i
@@ -67,7 +68,7 @@ class Queue:
     def _check_bank_statement_time(self, task):
         if not self._check_bank_statement(task):
             return False
-        task_timestamp=self._timestamp_for_task(task)
+        task_timestamp = self._timestamp_for_task(task)
         timestamps = [
             self._timestamp_for_task(queue_task)
             for queue_task in self._queue
@@ -90,6 +91,9 @@ class Queue:
 
     def _has_older_task(self, task):
         task_timestamp = self._timestamp_for_task(task)
+        return any(
+            self._timestamp_for_task(queue_task) < task_timestamp
+            for queue_task in self._queue)
 
     def _collect_dependencies(self, task: TaskSubmission) -> list[TaskSubmission]:
         provider = next((p for p in REGISTERED_PROVIDERS if p.name == task.provider), None)
@@ -144,7 +148,7 @@ class Queue:
             duplicate = self._queue[old_index]
             new_timestamp = self._timestamp_for_task(task)
             old_timestamp = self._timestamp_for_task(duplicate)
-            if new_timestamp<old_timestamp:
+            if new_timestamp < old_timestamp:
                 self._queue[old_index] = task
         return self.size
 
@@ -213,11 +217,10 @@ class Queue:
 
         return int((newest - oldest).total_seconds())
 
-
-
     def purge(self):
         self._queue.clear()
         return True
+
 
 """
 ===================================================================================================
@@ -302,5 +305,6 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
