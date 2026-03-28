@@ -177,7 +177,15 @@ class Queue:
     def age(self):
         if not self._queue:
             return 0
-        
+        timestamps = [
+            self._timestamp_for_task(task)
+            for task in self._queue
+        ]
+        newest = max(timestamps)
+        oldest = min(timestamps)
+
+        return int((newest - oldest).total_seconds())
+
 
 
     def purge(self):
