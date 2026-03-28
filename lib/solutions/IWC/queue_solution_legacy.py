@@ -68,7 +68,15 @@ class Queue:
         if not self._check_bank_statement(task):
             return False
         task_timestamp=self._timestamp_for_task(task)
-        
+        timestamps = [
+            self._timestamp_for_task(queue_task)
+            for queue_task in self._queue
+        ]
+        newest_timestamp = max(timestamps)
+
+        return (newest_timestamp - task_timestamp).total_seconds() >= 300
+
+
 
     def _collect_dependencies(self, task: TaskSubmission) -> list[TaskSubmission]:
         provider = next((p for p in REGISTERED_PROVIDERS if p.name == task.provider), None)
@@ -281,4 +289,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
