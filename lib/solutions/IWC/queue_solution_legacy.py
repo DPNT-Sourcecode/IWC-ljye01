@@ -202,19 +202,6 @@ class Queue:
             )
         )
 
-        oldest_bank_statement = self._get_oldest_bank_statement()
-        top_task = self._queue[0]
-
-        if oldest_bank_statement is not None:
-            bank_timestamp = self._timestamp_for_task(oldest_bank_statement)
-            task_timestamp = self._timestamp_for_task(top_task)
-            if bank_timestamp < task_timestamp:
-                self._queue.remove(oldest_bank_statement)
-                return TaskDispatch(
-                    provider=oldest_bank_statement.provider,
-                    user_id=oldest_bank_statement.user_id,
-                )
-
         task = self._queue.pop(0)
         return TaskDispatch(
             provider=task.provider,
@@ -326,3 +313,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
