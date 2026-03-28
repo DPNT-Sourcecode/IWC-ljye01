@@ -82,7 +82,11 @@ class Queue:
             if self._check_bank_statement_time(task)
         ]
 
-    def _get_
+    def _get_oldest_bank_statement(self):
+        statements = self._above_five_minute_bank_statements()
+        if not statements:
+            return None
+        return min(statements, key=self._timestamp_for_task)
 
     def _collect_dependencies(self, task: TaskSubmission) -> list[TaskSubmission]:
         provider = next((p for p in REGISTERED_PROVIDERS if p.name == task.provider), None)
@@ -295,3 +299,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
