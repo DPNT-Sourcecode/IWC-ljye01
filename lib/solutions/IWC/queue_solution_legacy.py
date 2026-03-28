@@ -62,46 +62,15 @@ class Queue:
     def _check_bank_statement(task):
         return task.provider == "bank_statements"
 
-    def _check_bank_statement_time(self, task):
-        if not self._check_bank_statement(task):
+    def _is_old_bank_statement(self,task):
+        if task.provider != "bank_statements":
             return False
+
         task_timestamp = self._timestamp_for_task(task)
-        timestamps = [
-            self._timestamp_for_task(queue_task)
-            for queue_task in self._queue
-        ]
-        newest_timestamp = max(timestamps)
 
-        return (newest_timestamp - task_timestamp).total_seconds() >= 300
+        newest_task_timestamp = max(self._timestamp_for_task(t) for t in self._queue)
 
-    def _above_five_minute_bank_statements(self):
-        return [
-            task for task in self._queue
-            if self._check_bank_statement_time(task)
-        ]
-
-    def _get_oldest_bank_statement(self):
-        statements = self._above_five_minute_bank_statements()
-        if not statements:
-            return None
-
-        oldest_task = None
-        oldest_timestamp = None
-        for task in self._queue:
-            if task not in statements:
-                continue
-            task_timestamp = self._timestamp_for_task(task)
-            if oldest_task is None or task_timestamp < oldest_timestamp:
-                oldest_task = task
-                oldest_timestamp = task_timestamp
-
-        return oldest_task
-
-    def _has_older_task(self, task):
-        task_timestamp = self._timestamp_for_task(task)
-        return any(
-            self._timestamp_for_task(queue_task) < task_timestamp
-            for queue_task in self._queue)
+        age = int(newest_task_timestamp - task_timestamp).total_seconds()
 
     def _collect_dependencies(self, task: TaskSubmission) -> list[TaskSubmission]:
         provider = next((p for p in REGISTERED_PROVIDERS if p.name == task.provider), None)
@@ -313,4 +282,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
