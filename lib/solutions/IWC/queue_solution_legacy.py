@@ -200,7 +200,14 @@ class Queue:
 
         for task in self._queue:
             task.metadata["time_sensitive_bank_statement"] = self._is_old_bank_statement(task)
-        
+
+        prio_statement = self._get_prio_bank_statement()
+        if prio_statement is not None:
+            self._queue.remove(prio_statement)
+            return TaskDispatch(
+                provider=prio_statement.provider,
+                user_id=prio_statement.user_id,
+            )
         self._queue.sort(
             key=lambda i: (
                 self._priority_for_task(i),
@@ -323,6 +330,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
