@@ -137,7 +137,7 @@ def test_old_bank_statements_use_fifo_order() -> None:
         call_enqueue(provider="bank_statements", user_id=2, timestamp=iso_ts(delta_minutes=2)).expect(2),
         call_enqueue(provider="bank_statements", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(3),
         call_enqueue(provider="companies_house", user_id=3, timestamp=iso_ts(delta_minutes=10)).expect(4),
-
+        call_size().expect(4),
         call_dequeue().expect(provider="id_verification", user_id=1),
         call_dequeue().expect(provider="bank_statements", user_id=2),
         call_dequeue().expect(provider="bank_statements", user_id=1),
