@@ -60,10 +60,7 @@ class Queue:
 
     @staticmethod
     def _check_bank_statement(task):
-        if task.provider == "bank_statements":
-            return True
-        else:
-            return False
+        return task.provider == "bank_statements"
 
     def _check_bank_statement_time(self, task):
         if not self._check_bank_statement(task):
@@ -329,3 +326,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
