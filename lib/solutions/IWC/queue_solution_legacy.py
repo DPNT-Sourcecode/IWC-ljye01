@@ -159,7 +159,11 @@ class Queue:
         oldest_bank_statement = self._get_oldest_bank_statement()
 
         if oldest_bank_statement and not self._has_older_task(oldest_bank_statement):
-            self._queue.
+            self._queue.remove(oldest_bank_statement)
+            return TaskDispatch(
+                provider=oldest_bank_statement.provider,
+                user_id=oldest_bank_statement.user_id,
+            )
 
         user_ids = {task.user_id for task in self._queue}
         task_count = {}

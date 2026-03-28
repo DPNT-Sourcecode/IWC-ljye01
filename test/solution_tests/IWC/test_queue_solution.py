@@ -95,3 +95,12 @@ def test_age() -> None:
         call_size().expect(2),
         call_age().expect(600)
     ])
+
+def test_old_bank_statement() -> None:
+    run_queue([
+        call_enqueue(provider="bank_statements", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
+        call_enqueue(provider="id_verification", user_id=1, timestamp=iso_ts(delta_minutes=5)).expect(2),
+        call_size().expect(2),
+        call_dequeue().expect(provider="id_verification", user_id=1),
+        call_dequeue().expect(provider="bank_statements", user_id=1),
+    ])
