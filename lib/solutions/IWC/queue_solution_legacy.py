@@ -51,6 +51,10 @@ class Queue:
     def __init__(self):
         self._queue = []
 
+    def _check_duplicate(self, task: TaskSubmission):
+        for i, task in enumerate(self._queue):
+            if task.user_id
+
     def _collect_dependencies(self, task: TaskSubmission) -> list[TaskSubmission]:
         provider = next((p for p in REGISTERED_PROVIDERS if p.name == task.provider), None)
         if provider is None:
@@ -242,3 +246,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
