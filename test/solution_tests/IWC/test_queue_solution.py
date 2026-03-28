@@ -7,9 +7,9 @@ from .utils import call_dequeue, call_enqueue, call_size, iso_ts, run_queue
 
 def test_enqueue_size_dequeue_flow() -> None:
     run_queue([
-        call_enqueue("companies_house", 1, iso_ts(delta_minutes=0)).expect(1),
-        call_size().expect(1),
-        call_dequeue().expect("companies_house", 1),
+        call_enqueue("credit_check", 1, iso_ts(delta_minutes=0)).expect(2),
+        call_size().expect(2),
+        call_dequeue().expect("credit_check", 1),
     ])
 
 
@@ -45,6 +45,13 @@ def test_dependency() -> None:
 def test_unique() -> None:
     run_queue([
         call_enqueue(provider="companies_house", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
-        call_enqueue(provider="companies_house", user_id=1, timestamp=iso_ts(delta_minutes=5)).expect(1),
+        call_enqueue(provider="companies_house", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
         call_size().expect(1),
+    ])
+
+def test_unique_with_timestamp() -> None:
+    run_queue([
+        call_enqueue(provider="credit_check", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(2),
+        call_enqueue(provider="credit_check", user_id=1, timestamp=iso_ts(delta_minutes=2)).expect(2),
+        call_size().expect(2),
     ])
