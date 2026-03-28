@@ -98,22 +98,35 @@ def test_age() -> None:
 
 def test_old_bank_statement_same_user() -> None:
     run_queue([
-        call_enqueue(provider="bank_statements", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
-        call_enqueue(provider="id_verification", user_id=1, timestamp=iso_ts(delta_minutes=2)).expect(2),
+        call_enqueue(provider="id_verification", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
+        call_enqueue(provider="bank_statements", user_id=1, timestamp=iso_ts(delta_minutes=2)).expect(2),
         call_enqueue(provider="companies_house", user_id=1, timestamp=iso_ts(delta_minutes=8)).expect(3),
         call_size().expect(3),
-        call_dequeue().expect(provider="bank_statements", user_id=1),
         call_dequeue().expect(provider="id_verification", user_id=1),
+        call_dequeue().expect(provider="bank_statements", user_id=1),
         call_dequeue().expect(provider="companies_house", user_id=1)
     ])
 
 def test_old_bank_statement_different_user() -> None:
     run_queue([
-        call_enqueue(provider="bank_statements", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
-        call_enqueue(provider="id_verification", user_id=2, timestamp=iso_ts(delta_minutes=2)).expect(2),
+        call_enqueue(provider="id_verification", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
+        call_enqueue(provider="bank_statements", user_id=2, timestamp=iso_ts(delta_minutes=2)).expect(2),
         call_enqueue(provider="companies_house", user_id=3, timestamp=iso_ts(delta_minutes=8)).expect(3),
         call_size().expect(3),
-        call_dequeue().expect(provider="id_verification", user_id=2),
+        call_dequeue().expect(provider="id_verification", user_id=1),
+        call_dequeue().expect(provider="bank_statements", user_id=2),
+        call_dequeue().expect(provider="companies_house", user_id=3)
+    ])
+
+def test_multiple_old_bank_statement_different_user() -> None:
+    run_queue([
+        call_enqueue(provider="id_verification", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
+        call_enqueue(provider="bank_statements", user_id=2, timestamp=iso_ts(delta_minutes=2)).expect(2),
+        call_enqueue(provider="bank_statements", user_id=1, timestamp=iso_ts(delta_minutes=3)).expect(3),
+        call_enqueue(provider="companies_house", user_id=3, timestamp=iso_ts(delta_minutes=20)).expect(4),
+        call_size().expect(4),
+        call_dequeue().expect(provider="id_verification", user_id=1),
+        call_dequeue().expect(provider="bank_statements", user_id=2),
         call_dequeue().expect(provider="bank_statements", user_id=1),
         call_dequeue().expect(provider="companies_house", user_id=3)
     ])
