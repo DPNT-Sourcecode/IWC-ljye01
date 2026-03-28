@@ -37,9 +37,7 @@ def test_timestamp() -> None:
 
 def test_dependency() -> None:
     run_queue([
-        call_enqueue(provider="logs", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
-        call_enqueue("banks", 5, iso_ts(delta_minutes=0)).expect(2),
-        call_enqueue("loans", 1, iso_ts(delta_minutes=0)).expect(3),
-        call_enqueue("users", 1, iso_ts(delta_minutes=0)).expect(4),
-        call_size().expect(4),
+        call_enqueue(provider="credit_check", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(2),
+        call_dequeue().expect(provider="companies_house", user_id=1),
+        call_dequeue().expect(provider="credit_check", user_id=1)
     ])
