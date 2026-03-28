@@ -83,7 +83,7 @@ class Queue:
 
     def _get_prio_bank_statement(self):
         statements = [task for task in self._queue
-                      if task.provider == "bank_statements" and self._is_old_bank_statement(task)]
+                      if self._is_old_bank_statement(task)]
 
         if not statements:
             return None
@@ -101,9 +101,10 @@ class Queue:
             if task is statement:
                 continue
 
-            timestamps = self._timestamp_for_task(task)
-            if timestamps<self._timestamp_for_task(statement):
+            timestamp = self._timestamp_for_task(task)
+            if timestamp < self._timestamp_for_task(statement):
                 return None
+        return statement
 
     def _collect_dependencies(self, task: TaskSubmission) -> list[TaskSubmission]:
         provider = next((p for p in REGISTERED_PROVIDERS if p.name == task.provider), None)
@@ -199,7 +200,7 @@ class Queue:
 
         for task in self._queue:
             task.metadata["time_sensitive_bank_statement"] = self._is_old_bank_statement(task)
-
+        
         self._queue.sort(
             key=lambda i: (
                 self._priority_for_task(i),
@@ -322,6 +323,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
