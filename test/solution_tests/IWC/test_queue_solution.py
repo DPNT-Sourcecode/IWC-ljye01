@@ -46,4 +46,5 @@ def test_unique() -> None:
     run_queue([
         call_enqueue(provider="companies_house", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
         call_enqueue(provider="companies_house", user_id=1, timestamp=iso_ts(delta_minutes=5)).expect(1),
+        call_size().expect(1),
     ])

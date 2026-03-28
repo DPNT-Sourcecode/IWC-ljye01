@@ -104,14 +104,14 @@ class Queue:
             metadata.setdefault("priority", Priority.NORMAL)
             metadata.setdefault("group_earliest_timestamp", MAX_TIMESTAMP)
             old_index = self._check_duplicate(task)
-            if not old_index:
+            if old_index is None:
                 self._queue.append(task)
                 continue
             duplicate = self._queue[old_index]
             new_timestamp = self._timestamp_for_task(task)
             old_timestamp = self._timestamp_for_task(duplicate)
             if new_timestamp<old_timestamp:
-                self._queue.append(task)
+                self._queue[old_index] = task
         return self.size
 
     def dequeue(self):
