@@ -40,6 +40,7 @@ def call_enqueue(provider: str, user_id: int, timestamp: str) -> QueueActionBuil
 def call_size() -> QueueActionBuilder:
     return QueueActionBuilder("size")
 
+def call_age()
 
 def call_dequeue() -> QueueActionBuilder:
     return QueueActionBuilder(
