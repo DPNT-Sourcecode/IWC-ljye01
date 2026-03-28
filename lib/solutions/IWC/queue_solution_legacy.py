@@ -57,6 +57,10 @@ class Queue:
                 return i
         return None
 
+    @staticmethod
+    def _check_bank_statement(task):
+        
+
     def _collect_dependencies(self, task: TaskSubmission) -> list[TaskSubmission]:
         provider = next((p for p in REGISTERED_PROVIDERS if p.name == task.provider), None)
         if provider is None:
@@ -256,3 +260,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
