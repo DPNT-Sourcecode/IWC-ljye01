@@ -70,6 +70,9 @@ class Queue:
         if task.provider != "bank_statements":
             return False
 
+        if not self._queue:
+            return False
+
         task_timestamp = self._timestamp_for_task(task)
 
         newest_task_timestamp = max(self._timestamp_for_task(t) for t in self._queue)
@@ -288,6 +291,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
