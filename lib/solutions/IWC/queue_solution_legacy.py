@@ -130,6 +130,7 @@ class Queue:
             metadata.setdefault("priority", Priority.NORMAL)
             metadata.setdefault("group_earliest_timestamp", MAX_TIMESTAMP)
             metadata.setdefault("order", self._counter)
+            self._counter += 1
             old_index = self._check_duplicate(task)
             if old_index is None:
                 self._queue.append(task)
@@ -179,6 +180,7 @@ class Queue:
 
         self._queue.sort(
             key=lambda i: (
+                0 if i.metadata.get("time_sensitive_bank_statement", False) else 1,
                 self._priority_for_task(i),
                 self._earliest_group_timestamp_for_task(i),
                 self._check_bank_statement(i),
@@ -211,6 +213,7 @@ class Queue:
 
     def purge(self):
         self._queue.clear()
+        self._counter = 0
         return True
 
 
@@ -297,4 +300,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
