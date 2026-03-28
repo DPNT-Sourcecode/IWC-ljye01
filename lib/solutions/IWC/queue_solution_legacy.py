@@ -156,6 +156,11 @@ class Queue:
         if self.size == 0:
             return None
 
+        oldest_bank_statement = self._get_oldest_bank_statement()
+
+        if oldest_bank_statement and not self._has_older_task(oldest_bank_statement):
+            self._queue.
+
         user_ids = {task.user_id for task in self._queue}
         task_count = {}
         priority_timestamps = {}
@@ -305,6 +310,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
