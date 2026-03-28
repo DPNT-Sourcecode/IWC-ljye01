@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from re import purge
+
 
 from .utils import call_dequeue, call_enqueue, call_size, iso_ts, run_queue
 
@@ -40,4 +40,10 @@ def test_dependency() -> None:
         call_enqueue(provider="credit_check", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(2),
         call_dequeue().expect(provider="companies_house", user_id=1),
         call_dequeue().expect(provider="credit_check", user_id=1)
+    ])
+
+def test_unique() -> None:
+    run_queue([
+        call_enqueue(provider="companies_house", user_id=1, timestamp=iso_ts(delta_minutes=0)).expect(1),
+        call_enqueue(provider="companies_house", user_id=1, timestamp=iso_ts(delta_minutes=5)).expect(1),
     ])
