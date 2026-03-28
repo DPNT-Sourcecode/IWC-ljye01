@@ -87,7 +87,9 @@ class Queue:
         statements = self._above_five_minute_bank_statements()
         if not statements:
             return None
-        return min(statements, key=self._timestamp_for_task)
+        for task in self._queue:
+            if task in statements:
+                return task
 
     def _has_older_task(self, task):
         task_timestamp = self._timestamp_for_task(task)
@@ -314,7 +316,3 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
-
-
-
-
