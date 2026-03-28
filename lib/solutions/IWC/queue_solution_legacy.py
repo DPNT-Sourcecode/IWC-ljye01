@@ -51,6 +51,7 @@ REGISTERED_PROVIDERS: list[Provider] = [
 class Queue:
     def __init__(self):
         self._queue = []
+        self._counter = 0
 
     def _check_duplicate(self, task: TaskSubmission) -> int | None:
         for i, q_task in enumerate(self._queue):
@@ -128,6 +129,7 @@ class Queue:
             metadata = task.metadata
             metadata.setdefault("priority", Priority.NORMAL)
             metadata.setdefault("group_earliest_timestamp", MAX_TIMESTAMP)
+            metadata.setdefault("order", self._counter)
             old_index = self._check_duplicate(task)
             if old_index is None:
                 self._queue.append(task)
@@ -295,3 +297,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
