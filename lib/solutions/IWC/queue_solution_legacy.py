@@ -158,8 +158,8 @@ class Queue:
             key=lambda i: (
                 self._priority_for_task(i),
                 self._earliest_group_timestamp_for_task(i),
-                self._timestamp_for_task(i),
-                self._check_bank_statement(i)
+                self._check_bank_statement(i),
+                self._timestamp_for_task(i)
             )
         )
 
